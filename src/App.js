@@ -35,7 +35,10 @@ const CommandPrompt = styled.input({
   outline: "none",
   width: 500,
   height: 46,
-  fontSize: 30
+  fontSize: 30,
+  "@media (max-width: 560px)": {
+    width: "94%"
+  }
 })
 
 const CommandPromptPrefixWrapper = styled.div({
@@ -51,7 +54,10 @@ const ThingsToTryWrapper = styled.div({
   textAlign: "left",
   padding: 15,
   fontSize: 16,
-  width: 530
+  width: 530,
+  "@media (max-width: 560px)": {
+    width: "94%"
+  }
 })
 
 const Error = styled.div({
