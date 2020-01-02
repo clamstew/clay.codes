@@ -245,7 +245,11 @@ function App() {
             <span>Press</span>{" "}
             <SubmitButton onClick={() => runCommand(command)}>
               Enter
-            </SubmitButton>
+            </SubmitButton>{" "}
+            <span>or</span>{" "}
+            <AppLink href="#/" onClick={tryAgain}>
+              Try again.
+            </AppLink>
           </div>
         )}
       </AppHeader>
