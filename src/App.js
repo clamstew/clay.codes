@@ -63,7 +63,16 @@ const ThingsToTryWrapper = styled.div({
 const Error = styled.div({
   color: 'red',
   marginBottom: 20
-})
+});
+
+const goSiteToCommands = {
+  "twitter": "https://twitter.com/Clay_Stewart",
+  "github": "https://github.com/clamstew",
+  "hire me": "https://www.linkedin.com/in/claystewart/",
+  "box it up": "https://www.mybox.es"
+};
+
+const allCommands = [...Object.keys(goSiteToCommands)];
 
 function App() {
   const commandPromptRef = useRef(null);
@@ -71,32 +80,13 @@ function App() {
   const [commandError, setCommandError] = useState("")
 
   function runCommand(command) {
-    console.warn("command running...", command);
-
-    if (command === "twitter") {
-      const myTwitter = "https://twitter.com/Clay_Stewart";
-      window.open(myTwitter, '_blank');
-    }
-
-    else if (command === "github") {
-      const myGithub = "https://github.com/clamstew";
-      window.open(myGithub, '_blank');
-    }
-
-    else if (command === "hire me") {
-      const myGithub = "https://www.linkedin.com/in/claystewart/";
-      window.open(myGithub, '_blank');
-    }
-
-    else if (command === "box it up") {
-      const myBoxes = "https://www.mybox.es";
-      window.open(myBoxes, '_blank');
-    }
-
-    else {
+    // console.warn("command running...", command);
+    if (goSiteToCommands[command]) {
+      window.open(goSiteToCommands[command], '_blank');
+      return;
+    } else {
       setCommandError(`bash: command not found: ${command}`);
     }
-
   }
 
   useEffect(() => {
@@ -106,17 +96,17 @@ function App() {
 
     const keyUpEventListener = event => {
       
-      console.warn("what am i typing:", event.target.value)
+      // console.warn("what am i typing:", event.target.value)
       
       // will run command highlighting here
     };
 
     const keyDownEventListener = event => {
       // https://stackoverflow.com/questions/47809282/submit-a-form-when-enter-is-pressed-in-a-textarea-in-react?rq=1
-      console.warn("what keycode", event.which);
+      // console.warn("what keycode", event.which);
       if (event.which === 13 && event.shiftKey === false) {
         event.preventDefault();
-        runCommand(command);
+        runCommand(command.toLowerCase());
       } else {
         setCommandError("");
       }
@@ -148,15 +138,12 @@ function App() {
             placeholder="Type a command" />
         </CommandPromptWrapper>
 
-        <Error>{commandError}</Error>
+        {commandError && <Error>{commandError}</Error>}
 
         <ThingsToTryWrapper>
           <div>Things to try:</div>
           <ul>
-            <li>twitter</li>
-            <li>github</li>
-            <li>hire me</li>
-            <li>box it up</li>
+            {allCommands.map(command => <li key={command}>{command}</li>)}
           </ul>
         </ThingsToTryWrapper>
       </AppHeader>
