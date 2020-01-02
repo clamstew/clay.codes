@@ -208,6 +208,9 @@ function App() {
           <CommandPrompt
             ref={commandPromptRef}
             spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
             onChange={e => setCommand(e.target.value)}
             placeholder="run a command ..."
           />
