@@ -69,7 +69,8 @@ const goSiteToCommands = {
   "twitter": "https://twitter.com/Clay_Stewart",
   "github": "https://github.com/clamstew",
   "hire me": "https://www.linkedin.com/in/claystewart/",
-  "box it up": "https://www.mybox.es"
+  "box it up": "https://www.mybox.es",
+  "asdf": "https://github.com/asdf-vm/asdf"
 };
 
 const allCommands = [...Object.keys(goSiteToCommands)];
@@ -135,15 +136,19 @@ function App() {
             ref={commandPromptRef}
             spellcheck="false"
             onChange={(e) => (setCommand(e.target.value))}
-            placeholder="Type a command" />
+            placeholder="Run a command ..." />
         </CommandPromptWrapper>
 
         {commandError && <Error>{commandError}</Error>}
 
         <ThingsToTryWrapper>
-          <div>Things to try:</div>
+          <div>Commands to try:</div>
           <ul>
-            {allCommands.map(command => <li key={command}>{command}</li>)}
+            {command === "" && allCommands.map(cmd => <li key={cmd}>{cmd}</li>)}
+            {command !== "" && allCommands.filter(cmd => {
+              const regex = new RegExp(command);
+              return cmd.match(regex);
+            }).map(cmd => <li key={cmd}>{cmd}</li>)}
           </ul>
         </ThingsToTryWrapper>
       </AppHeader>
