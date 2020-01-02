@@ -80,7 +80,11 @@ const SubmitButton = styled.button({
   color: "white",
   borderRadius: "5px",
   fontSize: 18,
-  cursor: "pointer"
+  cursor: "pointer",
+  ":hover": {
+    // outline: "2px solid white"
+    boxShadow: "0 0 0 2px white"
+  }
 });
 
 const goSiteToCommands = {
@@ -131,14 +135,20 @@ function App() {
     const runCommandAlias = runCommand;
 
     const keyUpEventListener = event => {
-      console.warn("what am i typing:", event.target.value);
+      // console.warn("what am i typing:", event.target.value);
       // will run command highlighting here
     };
 
     const keyDownEventListener = event => {
       // https://stackoverflow.com/questions/47809282/submit-a-form-when-enter-is-pressed-in-a-textarea-in-react?rq=1
-      console.warn("what keycode", event.which);
-      if (event.which === 13 && event.shiftKey === false) {
+      // console.warn("what keycode", event.which);
+      if (event.which === 27 && event.shiftKey === false) {
+        event.preventDefault();
+        setCommand("");
+        setCommandError("");
+        setCommandOutput("");
+        // @FIXME - need to clear input value
+      } else if (event.which === 13 && event.shiftKey === false) {
         event.preventDefault();
         runCommandAlias(command.toLowerCase());
       } else {
