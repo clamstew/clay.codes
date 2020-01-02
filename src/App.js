@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, /*useCallback,*/ useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
 
 const AppWrapper = styled.div({
@@ -74,6 +74,15 @@ const AppLink = styled.a({
   color: "#61dafb"
 });
 
+const SubmitButton = styled.button({
+  background: "#282c34",
+  border: "1px solid white",
+  color: "white",
+  borderRadius: "5px",
+  fontSize: 18,
+  cursor: "pointer"
+});
+
 const goSiteToCommands = {
   twitter: "https://twitter.com/Clay_Stewart",
   github: "https://github.com/clamstew",
@@ -92,36 +101,46 @@ function App() {
   const [commandOutput, setCommandOutput] = useState("");
   const [commandHistory, setCommandHistory] = useState([]);
 
+  const runCommand = useCallback(
+    command => {
+      // console.warn("command running...", command);
+      let output = "";
+      if (goSiteToCommands[command]) {
+        output = `Opening site: ${goSiteToCommands[command]}`;
+        setCommandOutput(output);
+        // delay for a hot second, so user can see the output
+        setTimeout(() => {
+          window.open(goSiteToCommands[command], "_blank");
+        }, 600);
+      } else {
+        output = `bash: command not found: ${command}`;
+        setCommandError(output);
+      }
+
+      // add command to command history
+      setCommandHistory([...commandHistory, { command, output }]);
+    },
+    [commandHistory]
+  );
+
   useEffect(() => {
     const currentCommandPromptRef = commandPromptRef.current;
     // https://stackoverflow.com/questions/53314857/how-to-focus-something-on-next-render-with-react-hooks
     currentCommandPromptRef.focus();
 
-    function runCommand(command) {
-      // console.warn("command running...", command);
-      let output = "";
-      if (goSiteToCommands[command]) {
-        window.open(goSiteToCommands[command], "_blank");
-        output = `Opening site: ${goSiteToCommands[command]}`;
-        setCommandOutput(output);
-      } else {
-        output = `bash: command not found: ${command}`;
-        setCommandError(output);
-      }
-      setCommandHistory([...commandHistory, { command, output }]);
-    }
+    const runCommandAlias = runCommand;
 
     const keyUpEventListener = event => {
-      // console.warn("what am i typing:", event.target.value)
+      console.warn("what am i typing:", event.target.value);
       // will run command highlighting here
     };
 
     const keyDownEventListener = event => {
       // https://stackoverflow.com/questions/47809282/submit-a-form-when-enter-is-pressed-in-a-textarea-in-react?rq=1
-      // console.warn("what keycode", event.which);
+      console.warn("what keycode", event.which);
       if (event.which === 13 && event.shiftKey === false) {
         event.preventDefault();
-        runCommand(command.toLowerCase());
+        runCommandAlias(command.toLowerCase());
       } else {
         setCommandError("");
         setCommandOutput("");
@@ -140,7 +159,7 @@ function App() {
         keyDownEventListener
       );
     };
-  }, [command, commandHistory]);
+  }, [command, commandHistory, runCommand]);
 
   const commandsThatMatchPartialCommand = allCommands.filter(cmd => {
     const regex = new RegExp(command.toLowerCase());
@@ -154,10 +173,25 @@ function App() {
     commandPromptRef.current.value = "";
   };
 
+  const CommandExample = ({ cmd }) => (
+    <li
+      style={{ cursor: "pointer" }}
+      onClick={() => {
+        setCommand(cmd);
+        commandPromptRef.current.value = cmd;
+      }}>
+      {cmd}
+    </li>
+  );
+
+  const matchingCommandTyped =
+    commandsThatMatchPartialCommand.length === 1 &&
+    commandsThatMatchPartialCommand[0] === command;
+
   return (
     <AppWrapper>
       <AppHeader>
-        <SiteTitle>clay.codes</SiteTitle>
+        <SiteTitle>&lt;clay.codes /&gt;</SiteTitle>
 
         <CommandPromptWrapper>
           <CommandPromptPrefixWrapper>$></CommandPromptPrefixWrapper>
@@ -172,26 +206,38 @@ function App() {
         {commandError && <Error>{commandError}</Error>}
         {commandOutput && <SuccessOutput>{commandOutput}</SuccessOutput>}
 
-        <ThingsToTryWrapper>
-          {commandsThatMatchPartialCommand.length > 0 && (
-            <div>Commands to try:</div>
-          )}
-          {commandsThatMatchPartialCommand.length > 0 || (
-            <div>
-              No matching commands.{" "}
-              <AppLink href="#/" onClick={tryAgain}>
-                Try again.
-              </AppLink>
-            </div>
-          )}
-          <ul>
-            {command === "" && allCommands.map(cmd => <li key={cmd}>{cmd}</li>)}
-            {command !== "" &&
-              commandsThatMatchPartialCommand.map(cmd => (
-                <li key={cmd}>{cmd}</li>
-              ))}
-          </ul>
-        </ThingsToTryWrapper>
+        {matchingCommandTyped || (
+          <ThingsToTryWrapper>
+            {commandsThatMatchPartialCommand.length > 0 && (
+              <div>Commands to try:</div>
+            )}
+            {commandsThatMatchPartialCommand.length > 0 || (
+              <div>
+                No matching commands.{" "}
+                <AppLink href="#/" onClick={tryAgain}>
+                  Try again.
+                </AppLink>
+              </div>
+            )}
+            <ul>
+              {command === "" &&
+                allCommands.map(cmd => <CommandExample key={cmd} cmd={cmd} />)}
+              {command !== "" &&
+                commandsThatMatchPartialCommand.map(cmd => (
+                  <CommandExample key={cmd} cmd={cmd} />
+                ))}
+            </ul>
+          </ThingsToTryWrapper>
+        )}
+
+        {matchingCommandTyped && (
+          <div>
+            <span>Press</span>{" "}
+            <SubmitButton onClick={() => runCommand(command)}>
+              Enter
+            </SubmitButton>
+          </div>
+        )}
       </AppHeader>
     </AppWrapper>
   );
