@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, /*useCallback,*/ useState} from 'react';
+import React, { useEffect, useRef, /*useCallback,*/ useState } from "react";
 import styled from "@emotion/styled";
 
 const AppWrapper = styled.div({
@@ -20,13 +20,13 @@ const SiteTitle = styled.code({
   fontSize: 40,
   fontWeight: 400,
   userSelect: "none"
-})
+});
 
 const CommandPromptWrapper = styled.div({
   display: "flex",
   alignContent: "center",
   margin: "50px 0px"
-})
+});
 
 const CommandPrompt = styled.input({
   display: "inline-block",
@@ -40,13 +40,13 @@ const CommandPrompt = styled.input({
   "@media (max-width: 560px)": {
     width: "94%"
   }
-})
+});
 
 const CommandPromptPrefixWrapper = styled.div({
   display: "inline-block",
   color: "white",
   fontSize: 40
-})
+});
 
 const ThingsToTryWrapper = styled.div({
   color: "white",
@@ -59,27 +59,27 @@ const ThingsToTryWrapper = styled.div({
   "@media (max-width: 560px)": {
     width: "94%"
   }
-})
+});
 
 const Error = styled.div({
-  color: 'red',
+  color: "red",
   marginBottom: 20
 });
 
 const SuccessOutput = styled.div({
   color: "green"
-})
+});
 
 const AppLink = styled.a({
   color: "#61dafb"
-})
+});
 
 const goSiteToCommands = {
-  "twitter": "https://twitter.com/Clay_Stewart",
-  "github": "https://github.com/clamstew",
+  twitter: "https://twitter.com/Clay_Stewart",
+  github: "https://github.com/clamstew",
   "hire me": "https://www.linkedin.com/in/claystewart/",
   "box it up": "https://www.mybox.es",
-  "asdf": "https://github.com/asdf-vm/asdf",
+  asdf: "https://github.com/asdf-vm/asdf",
   "site code": "https://github.com/clamstew/clay.codes"
 };
 
@@ -87,7 +87,7 @@ const allCommands = [...Object.keys(goSiteToCommands)];
 
 function App() {
   const commandPromptRef = useRef(null);
-  const [command, setCommand] = useState("")
+  const [command, setCommand] = useState("");
   const [commandError, setCommandError] = useState("");
   const [commandOutput, setCommandOutput] = useState("");
   const [commandHistory, setCommandHistory] = useState([]);
@@ -101,20 +101,18 @@ function App() {
       // console.warn("command running...", command);
       let output = "";
       if (goSiteToCommands[command]) {
-        window.open(goSiteToCommands[command], '_blank');
+        window.open(goSiteToCommands[command], "_blank");
         output = `Opening site: ${goSiteToCommands[command]}`;
-        setCommandOutput(output)
+        setCommandOutput(output);
       } else {
         output = `bash: command not found: ${command}`;
         setCommandError(output);
       }
-      setCommandHistory([...commandHistory, {command, output}])
+      setCommandHistory([...commandHistory, { command, output }]);
     }
 
     const keyUpEventListener = event => {
-      
       // console.warn("what am i typing:", event.target.value)
-      
       // will run command highlighting here
     };
 
@@ -133,24 +131,27 @@ function App() {
     // Add event listener
     currentCommandPromptRef.addEventListener("keyup", keyUpEventListener);
     currentCommandPromptRef.addEventListener("keydown", keyDownEventListener);
-      
+
     // Remove event listener on cleanup
     return () => {
       currentCommandPromptRef.removeEventListener("keyup", keyUpEventListener);
-      currentCommandPromptRef.removeEventListener("keydown", keyDownEventListener);
+      currentCommandPromptRef.removeEventListener(
+        "keydown",
+        keyDownEventListener
+      );
     };
   }, [command, commandHistory]);
-  
+
   const commandsThatMatchPartialCommand = allCommands.filter(cmd => {
     const regex = new RegExp(command.toLowerCase());
     return cmd.match(regex);
   });
 
-  const tryAgain = (e) =>{
+  const tryAgain = e => {
     setCommand("");
     setCommandError("");
     setCommandOutput("");
-    commandPromptRef.current.value ="";
+    commandPromptRef.current.value = "";
   };
 
   return (
@@ -163,21 +164,32 @@ function App() {
           <CommandPrompt
             ref={commandPromptRef}
             spellcheck="false"
-            onChange={(e) => (setCommand(e.target.value))}
-            placeholder="run a command ..." />
+            onChange={e => setCommand(e.target.value)}
+            placeholder="run a command ..."
+          />
         </CommandPromptWrapper>
 
         {commandError && <Error>{commandError}</Error>}
         {commandOutput && <SuccessOutput>{commandOutput}</SuccessOutput>}
 
         <ThingsToTryWrapper>
-          {commandsThatMatchPartialCommand.length > 0 &&
-            <div>Commands to try:</div>}
-          {commandsThatMatchPartialCommand.length > 0 ||
-            <div>No matching commands. <AppLink href="#/" onClick={tryAgain}>Try again.</AppLink></div>}
+          {commandsThatMatchPartialCommand.length > 0 && (
+            <div>Commands to try:</div>
+          )}
+          {commandsThatMatchPartialCommand.length > 0 || (
+            <div>
+              No matching commands.{" "}
+              <AppLink href="#/" onClick={tryAgain}>
+                Try again.
+              </AppLink>
+            </div>
+          )}
           <ul>
             {command === "" && allCommands.map(cmd => <li key={cmd}>{cmd}</li>)}
-            {command !== "" && commandsThatMatchPartialCommand.map(cmd => <li key={cmd}>{cmd}</li>)}
+            {command !== "" &&
+              commandsThatMatchPartialCommand.map(cmd => (
+                <li key={cmd}>{cmd}</li>
+              ))}
           </ul>
         </ThingsToTryWrapper>
       </AppHeader>

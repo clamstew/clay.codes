@@ -1,0 +1,12 @@
+{
+  "prettier.jsxBracketSameLine": true,
+  "prettier.packageManager": "yarn",
+  "prettier.prettierPath": "./node_modules/prettier",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "folders": [],
+  "settings": {},
+  "editor.formatOnSave": true
+}
