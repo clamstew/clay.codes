@@ -16,9 +16,10 @@ const AppHeader = styled.header({
   color: "cyan"
 });
 
-const SiteTitle = styled.div({
+const SiteTitle = styled.code({
   fontSize: 40,
-  fontWeight: 400
+  fontWeight: 400,
+  userSelect: "none"
 })
 
 const CommandPromptWrapper = styled.div({
@@ -65,12 +66,21 @@ const Error = styled.div({
   marginBottom: 20
 });
 
+const SuccessOutput = styled.div({
+  color: "green"
+})
+
+const AppLink = styled.a({
+  color: "#61dafb"
+})
+
 const goSiteToCommands = {
   "twitter": "https://twitter.com/Clay_Stewart",
   "github": "https://github.com/clamstew",
   "hire me": "https://www.linkedin.com/in/claystewart/",
   "box it up": "https://www.mybox.es",
-  "asdf": "https://github.com/asdf-vm/asdf"
+  "asdf": "https://github.com/asdf-vm/asdf",
+  "site code": "https://github.com/clamstew/clay.codes"
 };
 
 const allCommands = [...Object.keys(goSiteToCommands)];
@@ -78,22 +88,28 @@ const allCommands = [...Object.keys(goSiteToCommands)];
 function App() {
   const commandPromptRef = useRef(null);
   const [command, setCommand] = useState("")
-  const [commandError, setCommandError] = useState("")
-
-  function runCommand(command) {
-    // console.warn("command running...", command);
-    if (goSiteToCommands[command]) {
-      window.open(goSiteToCommands[command], '_blank');
-      return;
-    } else {
-      setCommandError(`bash: command not found: ${command}`);
-    }
-  }
+  const [commandError, setCommandError] = useState("");
+  const [commandOutput, setCommandOutput] = useState("");
+  const [commandHistory, setCommandHistory] = useState([]);
 
   useEffect(() => {
     const currentCommandPromptRef = commandPromptRef.current;
     // https://stackoverflow.com/questions/53314857/how-to-focus-something-on-next-render-with-react-hooks
     currentCommandPromptRef.focus();
+
+    function runCommand(command) {
+      // console.warn("command running...", command);
+      let output = "";
+      if (goSiteToCommands[command]) {
+        window.open(goSiteToCommands[command], '_blank');
+        output = `Opening site: ${goSiteToCommands[command]}`;
+        setCommandOutput(output)
+      } else {
+        output = `bash: command not found: ${command}`;
+        setCommandError(output);
+      }
+      setCommandHistory([...commandHistory, {command, output}])
+    }
 
     const keyUpEventListener = event => {
       
@@ -110,6 +126,7 @@ function App() {
         runCommand(command.toLowerCase());
       } else {
         setCommandError("");
+        setCommandOutput("");
       }
     };
 
@@ -122,8 +139,19 @@ function App() {
       currentCommandPromptRef.removeEventListener("keyup", keyUpEventListener);
       currentCommandPromptRef.removeEventListener("keydown", keyDownEventListener);
     };
-  }, [command]);
+  }, [command, commandHistory]);
   
+  const commandsThatMatchPartialCommand = allCommands.filter(cmd => {
+    const regex = new RegExp(command.toLowerCase());
+    return cmd.match(regex);
+  });
+
+  const tryAgain = (e) =>{
+    setCommand("");
+    setCommandError("");
+    setCommandOutput("");
+    commandPromptRef.current.value ="";
+  };
 
   return (
     <AppWrapper>
@@ -136,19 +164,20 @@ function App() {
             ref={commandPromptRef}
             spellcheck="false"
             onChange={(e) => (setCommand(e.target.value))}
-            placeholder="Run a command ..." />
+            placeholder="run a command ..." />
         </CommandPromptWrapper>
 
         {commandError && <Error>{commandError}</Error>}
+        {commandOutput && <SuccessOutput>{commandOutput}</SuccessOutput>}
 
         <ThingsToTryWrapper>
-          <div>Commands to try:</div>
+          {commandsThatMatchPartialCommand.length > 0 &&
+            <div>Commands to try:</div>}
+          {commandsThatMatchPartialCommand.length > 0 ||
+            <div>No matching commands. <AppLink href="#/" onClick={tryAgain}>Try again.</AppLink></div>}
           <ul>
             {command === "" && allCommands.map(cmd => <li key={cmd}>{cmd}</li>)}
-            {command !== "" && allCommands.filter(cmd => {
-              const regex = new RegExp(command);
-              return cmd.match(regex);
-            }).map(cmd => <li key={cmd}>{cmd}</li>)}
+            {command !== "" && commandsThatMatchPartialCommand.map(cmd => <li key={cmd}>{cmd}</li>)}
           </ul>
         </ThingsToTryWrapper>
       </AppHeader>
