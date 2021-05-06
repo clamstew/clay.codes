@@ -22,10 +22,14 @@ const SiteTitle = styled.code({
   userSelect: "none"
 });
 
-const CommandPromptWrapper = styled.div({
-  display: "flex",
-  alignContent: "center",
-  margin: "50px 0px"
+const CommandPromptWrapper = styled.div(({ outputShown }) => {
+  const styles = {
+    display: "flex",
+    alignContent: "center",
+    margin: "50px 0px"
+  };
+  if (outputShown) styles.margin = "50px 0 0 0";
+  return styles;
 });
 
 const CommandPrompt = styled.input({
@@ -67,7 +71,10 @@ const Error = styled.div({
 });
 
 const SuccessOutput = styled.div({
-  color: "green"
+  color: "green",
+  textAlign: "left",
+  width: 548,
+  marginBottom: 30
 });
 
 const AppLink = styled.a({
@@ -96,7 +103,14 @@ const goSiteToCommands = {
   "site code": "https://github.com/clamstew/clay.codes"
 };
 
-const allCommands = [...Object.keys(goSiteToCommands)];
+const terminalCommands = {
+  history: "history"
+};
+
+const allCommands = [
+  ...Object.keys(goSiteToCommands),
+  ...Object.keys(terminalCommands)
+];
 
 function App() {
   const commandPromptRef = useRef(null);
@@ -106,7 +120,7 @@ function App() {
   const [commandHistory, setCommandHistory] = useState([]);
 
   const runCommand = useCallback(
-    command => {
+    (command) => {
       // console.warn("command running...", command);
       let output = "";
       if (goSiteToCommands[command]) {
@@ -116,6 +130,12 @@ function App() {
         setTimeout(() => {
           window.open(goSiteToCommands[command], "_blank");
         }, 600);
+      } else if (command === terminalCommands.history) {
+        // print history
+        const historyString = commandHistory
+          .map((historyItem) => historyItem.command)
+          .join("<br />");
+        setCommandOutput(historyString);
       } else {
         output = `bash: command not found: ${command}`;
         setCommandError(output);
@@ -134,12 +154,12 @@ function App() {
 
     const runCommandAlias = runCommand;
 
-    const keyUpEventListener = event => {
+    const keyUpEventListener = (event) => {
       // console.warn("what am i typing:", event.target.value);
       // will run command highlighting here
     };
 
-    const keyDownEventListener = event => {
+    const keyDownEventListener = (event) => {
       // https://stackoverflow.com/questions/47809282/submit-a-form-when-enter-is-pressed-in-a-textarea-in-react?rq=1
       // console.warn("what keycode", event.which);
       if (event.which === 27 && event.shiftKey === false) {
@@ -171,12 +191,12 @@ function App() {
     };
   }, [command, commandHistory, runCommand]);
 
-  const commandsThatMatchPartialCommand = allCommands.filter(cmd => {
+  const commandsThatMatchPartialCommand = allCommands.filter((cmd) => {
     const regex = new RegExp(command.toLowerCase());
     return cmd.match(regex);
   });
 
-  const tryAgain = e => {
+  const tryAgain = (e) => {
     setCommand("");
     setCommandError("");
     setCommandOutput("");
@@ -189,7 +209,8 @@ function App() {
       onClick={() => {
         setCommand(cmd);
         commandPromptRef.current.value = cmd;
-      }}>
+      }}
+    >
       {cmd}
     </li>
   );
@@ -203,7 +224,7 @@ function App() {
       <AppHeader>
         <SiteTitle>&lt;clay.codes /&gt;</SiteTitle>
 
-        <CommandPromptWrapper>
+        <CommandPromptWrapper outputShown={commandOutput || commandError}>
           <CommandPromptPrefixWrapper>$></CommandPromptPrefixWrapper>
           <CommandPrompt
             ref={commandPromptRef}
@@ -211,13 +232,15 @@ function App() {
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
-            onChange={e => setCommand(e.target.value)}
+            onChange={(e) => setCommand(e.target.value)}
             placeholder="run a command ..."
           />
         </CommandPromptWrapper>
 
         {commandError && <Error>{commandError}</Error>}
-        {commandOutput && <SuccessOutput>{commandOutput}</SuccessOutput>}
+        {commandOutput && (
+          <SuccessOutput dangerouslySetInnerHTML={{ __html: commandOutput }} />
+        )}
 
         {matchingCommandTyped || (
           <ThingsToTryWrapper>
@@ -234,9 +257,11 @@ function App() {
             )}
             <ul>
               {command === "" &&
-                allCommands.map(cmd => <CommandExample key={cmd} cmd={cmd} />)}
+                allCommands.map((cmd) => (
+                  <CommandExample key={cmd} cmd={cmd} />
+                ))}
               {command !== "" &&
-                commandsThatMatchPartialCommand.map(cmd => (
+                commandsThatMatchPartialCommand.map((cmd) => (
                   <CommandExample key={cmd} cmd={cmd} />
                 ))}
             </ul>
