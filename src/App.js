@@ -94,6 +94,8 @@ const SubmitButton = styled.button({
   }
 });
 
+const CommandsListWrapper = styled.div({ columns: 2, marginTop: 20 });
+
 const goSiteToCommands = {
   twitter: "https://twitter.com/Clay_Stewart",
   github: "https://github.com/clamstew",
@@ -255,16 +257,18 @@ function App() {
                 </AppLink>
               </div>
             )}
-            <ul>
-              {command === "" &&
-                allCommands.map((cmd) => (
-                  <CommandExample key={cmd} cmd={cmd} />
-                ))}
-              {command !== "" &&
-                commandsThatMatchPartialCommand.map((cmd) => (
-                  <CommandExample key={cmd} cmd={cmd} />
-                ))}
-            </ul>
+            <CommandsListWrapper>
+              <ul style={{ margin: 0 }}>
+                {command === "" &&
+                  allCommands.map((cmd) => (
+                    <CommandExample key={cmd} cmd={cmd} />
+                  ))}
+                {command !== "" &&
+                  commandsThatMatchPartialCommand.map((cmd) => (
+                    <CommandExample key={cmd} cmd={cmd} />
+                  ))}
+              </ul>
+            </CommandsListWrapper>
           </ThingsToTryWrapper>
         )}
 
