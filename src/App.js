@@ -135,9 +135,9 @@ function App() {
         }, 600);
       } else if (command === terminalCommands.history) {
         // print history
-        const historyString = commandHistory
+        const historyString = `${commandHistory
           .map((historyItem) => historyItem.command)
-          .join("<br />");
+          .join("<br />")}<br />${command}`;
         setCommandOutput(historyString);
       } else {
         output = `bash: command not found: ${command}`;
