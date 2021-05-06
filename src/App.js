@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
+import { goSiteToCommands, terminalCommands, allCommands } from "./constants";
 
 const AppWrapper = styled.div({
   textAlign: "center"
@@ -67,7 +68,9 @@ const ThingsToTryWrapper = styled.div({
 
 const Error = styled.div({
   color: "red",
-  marginBottom: 20
+  textAlign: "left",
+  width: 548,
+  marginBottom: 30
 });
 
 const SuccessOutput = styled.div({
@@ -95,25 +98,6 @@ const SubmitButton = styled.button({
 });
 
 const CommandsListWrapper = styled.div({ columns: 2, marginTop: 20 });
-
-const goSiteToCommands = {
-  twitter: "https://twitter.com/Clay_Stewart",
-  github: "https://github.com/clamstew",
-  "hire me": "https://www.linkedin.com/in/claystewart/",
-  "box it up": "https://www.mybox.es",
-  asdf: "https://github.com/asdf-vm/asdf",
-  "site code": "https://github.com/clamstew/clay.codes",
-  notes: "https://notes.build"
-};
-
-const terminalCommands = {
-  history: "history"
-};
-
-const allCommands = [
-  ...Object.keys(goSiteToCommands),
-  ...Object.keys(terminalCommands)
-];
 
 function App() {
   const commandPromptRef = useRef(null);
