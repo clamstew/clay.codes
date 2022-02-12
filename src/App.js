@@ -137,7 +137,7 @@ function App() {
   useEffect(() => {
     const currentCommandPromptRef = commandPromptRef.current;
     // https://stackoverflow.com/questions/53314857/how-to-focus-something-on-next-render-with-react-hooks
-    currentCommandPromptRef.focus();
+    // currentCommandPromptRef.focus();
 
     const runCommandAlias = runCommand;
 
@@ -179,7 +179,38 @@ function App() {
   }, [command, commandHistory, runCommand]);
 
   const commandsThatMatchPartialCommand = allCommands.filter((cmd) => {
-    const regex = new RegExp(command.toLowerCase());
+    const regex = new RegExp(
+      command
+        .toLowerCase()
+        .replace("(", "")
+        .replace(")", "")
+        .replace("*", "")
+        .replace("&", "")
+        .replace("^", "")
+        .replace("%", "")
+        .replace("$", "")
+        .replace("#", "")
+        .replace("@", "")
+        .replace("!", "")
+        .replace("~", "")
+        .replace("`", "")
+        .replace("-", "")
+        .replace("_", "")
+        .replace("+", "")
+        .replace("=", "")
+        .replace("[", "")
+        .replace("]", "")
+        .replace("{", "")
+        .replace("}", "")
+        .replace("|", "")
+        .replace("\\", "")
+        .replace("/", "")
+        .replace("?", "")
+        .replace(">", "")
+        .replace(".", "")
+        .replace("<", "")
+        .replace(",", "")
+    );
     return cmd.match(regex);
   });
 
