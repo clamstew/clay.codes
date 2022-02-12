@@ -137,7 +137,7 @@ function App() {
   useEffect(() => {
     const currentCommandPromptRef = commandPromptRef.current;
     // https://stackoverflow.com/questions/53314857/how-to-focus-something-on-next-render-with-react-hooks
-    // currentCommandPromptRef.focus();
+    currentCommandPromptRef.focus();
 
     const runCommandAlias = runCommand;
 
